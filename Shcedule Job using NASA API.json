@@ -1,0 +1,113 @@
+{
+  "name": "Shcedule Job using NASA API",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c47fd5a4-b161-4d72-beb5-92ff30609eb9",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "resource": "donkiSolarFlare",
+        "additionalFields": {
+          "startDate": "={{ json.minus(10,\"days\") }}"
+        }
+      },
+      "type": "n8n-nodes-base.nasa",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "c75fb828-9ebb-4af7-8b15-2320d6b78ae0",
+      "name": "Get a DONKI solar flare",
+      "credentials": {
+        "nasaApi": {
+          "id": "d6RJbAKkkmwuM1BG",
+          "name": "NASA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7552b010-8547-4dde-ab9a-c16d88ba2d92",
+              "leftValue": "={{ $json.classType }}",
+              "rightValue": "=C",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "57b2e21d-2142-456a-80cc-2440801fde02",
+      "name": "If"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get a DONKI solar flare",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a DONKI solar flare": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c336d17b-089d-44e1-a6f4-5ed33e499503",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "619e8c4585426a18a0dc74a9450b76af0e2565cc29f22636d6501852211aeb40"
+  },
+  "id": "HhnctEhfD2pK0U9V",
+  "tags": []
+}
