@@ -1,0 +1,494 @@
+{
+  "name": "MultiAgent NewsLetter Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtHour": 5
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -640,
+        -48
+      ],
+      "id": "e326a86d-cf10-4095-ac6f-d0492f96c9eb",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "query": "AI adoption for samll bussiness",
+        "options": {
+          "topic": "news",
+          "search_depth": "basic",
+          "max_results": 3,
+          "time_range": "week"
+        }
+      },
+      "type": "@tavily/n8n-nodes-tavily.tavily",
+      "typeVersion": 1,
+      "position": [
+        -496,
+        -48
+      ],
+      "id": "fea51d5d-ba71-484a-a40e-3048a9f1ebba",
+      "name": "Search",
+      "credentials": {
+        "tavilyApi": {
+          "id": "sxGxzNbKblJ0i842",
+          "name": "Tavily account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -352,
+        160
+      ],
+      "id": "ac07df34-fc15-4a18-a7dc-02a792c2eb54",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "xU5Q37NWzxqvd2Z3",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"additionalProperties\": false,\n  \"properties\": {\n    \"title\": { \"type\": \"string\", \"minLength\": 10 },\n    \"topics\": {\n      \"type\": \"array\",\n      \"minItems\": 3,\n      \"maxItems\": 3,\n      \"items\": { \"type\": \"string\", \"minLength\": 3, \"maxLength\": 50 }\n    }\n  },\n  \"required\": [\"title\", \"topics\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -48,
+        160
+      ],
+      "id": "8f569fa7-eb17-4d7c-b68d-3fef0f01190f",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "output.topics",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        -48
+      ],
+      "id": "0484f99d-551a-4ec9-8262-17ac64ee8918",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "query": "={{ $json['output.topics'] }}",
+        "options": {
+          "time_range": "month",
+          "include_raw_content": true
+        }
+      },
+      "type": "@tavily/n8n-nodes-tavily.tavily",
+      "typeVersion": 1,
+      "position": [
+        64,
+        -48
+      ],
+      "id": "ff72c666-2386-40cc-bab3-5713855d1cde",
+      "name": "Search1",
+      "credentials": {
+        "tavilyApi": {
+          "id": "sxGxzNbKblJ0i842",
+          "name": "Tavily account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        224,
+        176
+      ],
+      "id": "b3a2ff75-b062-4fdb-bd09-c1768e528b23",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "xU5Q37NWzxqvd2Z3",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "output"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        464,
+        -48
+      ],
+      "id": "710bb646-28e6-4dd1-9217-ef086497a0c2",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        480,
+        160
+      ],
+      "id": "65846c6d-2afd-40eb-89da-87115ebe7929",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "xU5Q37NWzxqvd2Z3",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Topic: {{ $json.query }}\n\nUse these sources to write one standalone section:\n\n{{ $json.results.map(item => JSON.stringify(item,null,2)).join(\"\\n\\n\") }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        192,
+        -48
+      ],
+      "id": "ca1f6518-a7a5-437d-b15f-83d80be1245a",
+      "name": "Section Writer Agent"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here are recent articles to consider:\n\n{{ $json.results.map(item => JSON.stringify(item, null, 2)).join(\"\\n\\n\") }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are an expert newsletter planner. You receive 3–5 short article digests (title, URL, published date, content) from the past week.\n\nTask: \npropose a catchy edition title (≤ 80 chars) and exactly 3 concise topics (each 3–5 words) that reflect distinct angles for our audience of small-business leaders.\n\nConstraints: unique topics; no duplicates; no clickbait; be informative.\nOutput only via the required schema (no extra text)."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -352,
+        -48
+      ],
+      "id": "6dd30082-593b-49ef-8e05-3ec5a4f10b84",
+      "name": "Planning Agent"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Planning Agent').item.json.output.title }}\nSections: \n{{ $json.output.join(\"\\n\\n\\n\\n\") }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are the newsletter editor and layout stylist.\n\n**Input:** one title candidate and 3 Markdown sections with [n] footnotes.\n\n**Output:**\n1. **subject** — an email subject (≤ 80 chars, no emojis).\n2. **content** — a VALID, responsive HTML **body only** (no `<!DOCTYPE>`, `<html>`, or `<head>`).\n\n**HTML Requirements:**\n* Structure: include a header with the title + current date {{ $now.format(\"DDD\") }}, a short intro paragraph, the 3 sections (convert Markdown to HTML), a “Key Sources” section that deduplicates and numbers links, and a short friendly sign-off.\n* Typography: use `<h1>/<h2>`, `<p>`, `<ul>/<ol>`, `<a>`. Apply inline CSS for readability (max-width container, readable font size and line-height).\n* Links: anchors must include `rel=\"noopener noreferrer\"` and `target=\"_blank\"`.\n* Accessibility: semantic headings; include `alt` text if images appear (don’t invent images).\n* Restrictions: no external CSS/JS, no tracking pixels."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        608,
+        -48
+      ],
+      "id": "5ffeb3bc-a790-43ad-af40-4e8af3b5e2ae",
+      "name": "Editor"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"additionalProperties\": false,\n  \"properties\": {\n    \"subject\": {\n      \"type\": \"string\",\n      \"description\": \"the email subject\"\n    },\n    \"content\": {\n      \"type\": \"string\",\n      \"description\": \"the newsletter content\"\n    }\n  },\n  \"required\": [\"subject\", \"content\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        784,
+        160
+      ],
+      "id": "6675a897-66cb-48a1-ae27-202a7f8fd759",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "={{ $json.output.subject }}",
+        "emailType": "html",
+        "message": "={{ $json.output.content }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        912,
+        -48
+      ],
+      "id": "00031a8e-e8a7-41dd-b5d6-a65b5b9f4819",
+      "name": "Create a draft",
+      "webhookId": "722bf53d-e771-4029-9bf1-093bcd54499e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Km0HPmVO1PtKQ08V",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Split Out": [
+      {
+        "json": {
+          "output.topics": "AI for Operational Efficiency"
+        }
+      },
+      {
+        "json": {
+          "output.topics": "Gain Competitive Business Advantage"
+        }
+      },
+      {
+        "json": {
+          "output.topics": "Personalize Customer Journeys with AI"
+        }
+      }
+    ],
+    "Search": [
+      {
+        "json": {
+          "query": "AI adoption for samll bussiness",
+          "follow_up_questions": null,
+          "answer": null,
+          "images": [],
+          "results": [
+            {
+              "url": "https://abovethelaw.com/2025/10/3-ways-lawyers-are-finding-new-efficiencies-with-ai/",
+              "title": "3 Ways Lawyers Are Finding New Efficiencies With AI - Above the Law",
+              "score": 0.26967767,
+              "published_date": "Wed, 08 Oct 2025 15:52:00 GMT",
+              "content": "The top reason firms adopt legal-specific AI tools, for example, is integration with a trusted service provider, and firmwide adoption slightly slowed from 2023-24, according to the report. However, organizations that adopt AI tools are seeing big benefits; 61% of these firms report improved efficiency, while 21% report significant improvements. At the same time, firms that are slow to adopt risk falling behind competitors who leverage AI for both legal and business operations. This is one area particularly ripe for time savings, and AI tools have transformed these processes for the firms that utilize them. Law firms are using these tools for tasks as varied as reviewing and summarizing contracts, extracting key terms for deal management, and drafting document templates.",
+              "raw_content": null
+            },
+            {
+              "url": "https://www.finextra.com/the-long-read/1452/ai-powered-banking-agents-how-fis-can-support-europes-micro-business-long-tail",
+              "title": "AI-powered banking agents: How FIs can support Europe’s micro-business long tail - Finextra Research",
+              "score": 0.24207613,
+              "published_date": "Tue, 07 Oct 2025 09:14:26 GMT",
+              "content": "Image 4: AI-powered banking agents: How FIs can support Europe’s micro-business long tail Janusz Mieloszyk, first deputy CEO of Nest Bank – a Polish FI which serves the retail and small-and-medium-enterprise (SME) markets – argues that artificial intelligence (AI) holds the key to tailored banking services; and has the proof-of-concept to back it up. In an interview with Finextra, Mieloszyk claimed that by leveraging AI, banks can connect with small businesses and entrepreneurs in ways that are both efficient and effective – thus capturing a significant business opportunity within the marketplace, as well as supporting wider economic growth. Image 6: AI-powered banking agents: How FIs can support Europe’s micro-business long tail",
+              "raw_content": null
+            },
+            {
+              "url": "https://www.forbes.com/sites/andreahill/2025/10/03/ai-and-competitive-advantage-in-the-next-era/",
+              "title": "AI And Competitive Advantage In The Next Era - Forbes",
+              "score": 0.23100689,
+              "published_date": "Fri, 03 Oct 2025 22:20:19 GMT",
+              "content": "Digital businesses gained efficiency in how they reached customers and processed transactions, removing some of the friction of physical operations, but costs still rose as they scaled. In an AI-first world, success won’t come just from having data or intelligent systems; it will come from how well IT can translate between technology and operations. In the AI era, companies will be judged on whether they can make decisions that fit each customer’s situation, quickly and at scale, rather than running everyone through the same generic process. Competitive advantage will hinge on whether your technology teams understand processes from the user’s perspective and can translate business needs into system design.",
+              "raw_content": null
+            }
+          ],
+          "response_time": 0.3,
+          "request_id": "9d858edd-b544-4111-ab45-14f51eaa2f19"
+        }
+      }
+    ],
+    "Planning Agent": [
+      {
+        "json": {
+          "output": {
+            "title": "The AI Advantage: Next-Gen Strategies for Small Businesses",
+            "topics": [
+              "AI for Operational Efficiency",
+              "Gain Competitive Business Advantage",
+              "Personalize Customer Journeys with AI"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search": {
+      "main": [
+        [
+          {
+            "node": "Planning Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Planning Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Planning Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Search1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search1": {
+      "main": [
+        [
+          {
+            "node": "Section Writer Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Section Writer Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Editor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Editor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Section Writer Agent": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Planning Agent": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Editor",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Editor": {
+      "main": [
+        [
+          {
+            "node": "Create a draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5b283493-71fd-49a4-aac7-5e44df053f99",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a6840b306d0a749dc72dcc7dfaf3a3ae00f7f429635f5d7a64391686d480d740"
+  },
+  "id": "8FwCKy7AhT7spTt2",
+  "tags": []
+}
