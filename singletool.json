@@ -1,0 +1,135 @@
+{
+  "name": "singletool",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -464,
+        0
+      ],
+      "id": "a9b0f66a-3514-4426-8de3-51b50a008368",
+      "name": "When chat message received",
+      "webhookId": "0398ceda-3346-4190-b3fb-4e90a3484e7a"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -224,
+        -32
+      ],
+      "id": "cab2548f-9499-405f-b65a-7949302cbe1a",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        160
+      ],
+      "id": "8b64c559-a770-45c4-85cd-71b3b3699d59",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "xU5Q37NWzxqvd2Z3",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -96,
+        192
+      ],
+      "id": "8bc9fc17-1574-4ba7-8539-3f3fb99f34d2",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "resource": "all",
+        "limit": 10,
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.hackerNewsTool",
+      "typeVersion": 1,
+      "position": [
+        16,
+        272
+      ],
+      "id": "0fd65130-6e8b-408e-b894-532a8c404390",
+      "name": "Get many items in Hacker News"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many items in Hacker News": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5124d807-d808-4b66-b73a-5937a227bdc0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a6840b306d0a749dc72dcc7dfaf3a3ae00f7f429635f5d7a64391686d480d740"
+  },
+  "id": "zZEUSsBFIwNzxcZq",
+  "tags": []
+}
