@@ -1,0 +1,76 @@
+{
+  "name": "Get Data using other Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "9a0722a8-f047-46ea-bc3d-daa4ddb6790a",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1klcXQShEj36SR0PeDO3MbZYEFcA-BL6XHnknLZHHVps",
+          "mode": "list",
+          "cachedResultName": "ContactDetails",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1klcXQShEj36SR0PeDO3MbZYEFcA-BL6XHnknLZHHVps/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1klcXQShEj36SR0PeDO3MbZYEFcA-BL6XHnknLZHHVps/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        0
+      ],
+      "id": "5b5e0c31-7419-47c8-988b-ebceb811b44b",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "btdFz4nMMZcQu4c0",
+          "name": "Google Sheets account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2a549925-15db-44cf-bd6d-f20ee477ed46",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a6840b306d0a749dc72dcc7dfaf3a3ae00f7f429635f5d7a64391686d480d740"
+  },
+  "id": "zNymdIXahqL9GiA7",
+  "tags": []
+}
